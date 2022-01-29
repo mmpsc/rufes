@@ -17,6 +17,8 @@
 #       matches in the input data
 #######################################################
 # Functions ----
+`%!in%` <- negate(`%in%`)
+
 funcLoadRuFEs_ByPop <- function(dbPath, Grouping, Yr, abMission){
   # set up driver info and database path
   driverInfo <- "Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
@@ -83,12 +85,12 @@ funcLoadRuFEs_CommonData <- function(dbPath){
 
 # Import data ----
 # Pre-2003 data input file
-datInput <- if(year == 1985){
+datInput <- if(year %in% c(1980, 1981, 1983, 1985)){
   readxl::read_excel(
     paste0("//ADAMS/Data Sets/DB_Projects/AccessDBs/RuFEs/DataInputs/pre2003/qryRuFEs_", 
-           year, "_Daily_Catch+Passage_RawSalmon_a23-a27_replaced.xlsx"),
+           year, "_Daily_Catch+Passage_a23-a27_replaced.xlsx"),
     sheet = "qryRuFEs_Daily_Catch_Passage")
-} else if(year != 1985 & year < 1990){
+} else if(year %!in% c(1980, 1981, 1983, 1985) & year < 1990){
   readxl::read_excel(
     paste0("//ADAMS/Data Sets/DB_Projects/AccessDBs/RuFEs/DataInputs/pre2003/qryRuFEs_", 
            year, "_Daily_Catch+Passage.xlsx"),
@@ -190,8 +192,8 @@ datRF <- funcLoadRuFEs_ByPop(dbPath = db_path,
 # Convert categories ----
 # Rename I Type, User, and Gear to be consistent with RuFEs format
 datI %<>% 
- #  mutate(I_Gear = recode(I_Gear,
-  #                       AN = "An")) %>% 
+  mutate(I_Gear = recode(I_Gear,
+                         AN = "An")) %>% 
   mutate(I_Type = recode(I_Type,
                          Rec = "REC",
                          tf = "TF",
@@ -209,6 +211,7 @@ datI %<>%
          I_Area2 = recode(I_Area, 
                           a1 = "Area 1",
                           a2E = "Area 2East",
+                          a2w = "Area 2West",
                           a4b = "Area 4",
                           a4b5 = "US Area 4b/5", 
                           a4b56c = "US Area 4b/5/6c", 
@@ -236,10 +239,16 @@ datI %<>%
                           a16 = "Area 16", 
                           "a16-29" = "Area 14 - 29",
                           "a17-18" = "Area 17/18",
+                          a17 = "Area 17/29", 
                           "a17-29" = "Area 17/29", 
                           "a17-29a" = "Area 17/29",
                           a20 = "Area 20",
-                          # a21 = "Area 19 - 127",
+                          a21 = "Area 19 - 127", # for 1980
+                          # a23 = "Area 23", # changed in files
+                          # a24 = "Area 24", 
+                          # a25 = "Area 25", 
+                          # a26 = "Area 26", 
+                          # a27 = "Area 27",
                           a29 = "Area 29",
                           A29 = "Area 29",
                           a29a = "Area 29a", 

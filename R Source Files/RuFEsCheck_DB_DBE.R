@@ -302,6 +302,14 @@ dat %<>%
 # get dataframe of entries with errors
 datError <- dat %>% filter(Errors == "error" | MissingBroodstock == "missing broodstock")
 
+if(nrow(datError) >= 1){
+  datErrorSave <- datError
+} else {
+  # to clear out old error messages when you re-save summary info
+  datErrorSave <- as.data.frame(t(rep(NA, ncol(datError))))
+  colnames(datErrorSave) <- colnames(datError)
+}
+
 # Group data by MA-RSA group & spawning district ----
 # can also check this against the group export from RuFEs (NOT by Population)
 datGrpd <- dat %>% 
@@ -348,7 +356,11 @@ if(year %in% datSEF$Year){
            SEF_DBE = TotalDBE) %>% 
     mutate(SEF_DBE = as.numeric(SEF_DBE)) %>% 
     rowwise() %>% 
-    mutate(`diff (cal - SEF)` = CalculatedDBE - SEF_DBE)
+    mutate(`diff (cal - SEF)` = CalculatedDBE - SEF_DBE) %>% 
+    mutate(Year = ifelse(is.na(year),
+                         Year <- Year,
+                         Year <- year))
+  
 } else {
   datSEF <- as.data.frame(matrix(nrow = 0, ncol = 0))
 }
@@ -359,7 +371,7 @@ dlg_message(paste("Total number of DBE errors:", nrow(datError)), type = "ok")
 # save summary table
 datGrpd <- as.data.frame(datGrpd)
 datLong <- as.data.frame(dat)
-datError <- as.data.frame(datError)
+datError <- as.data.frame(datErrorSave)
 datSEF <- as.data.frame(datSEF)
 
 # filename <- paste0(here(), "/", year, "/Summaries/DBESummaryTable_", Sys.Date(),".xlsx")

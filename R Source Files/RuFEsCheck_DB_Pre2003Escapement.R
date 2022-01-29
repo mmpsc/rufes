@@ -209,6 +209,14 @@ datCheckError <- datCheck %>%
                 pDiffA, pDiffB, pDiffP, pErrorsA, 
                 pErrorsB, pErrorsP, pOverallErrors)
 
+if(nrow(datCheckError) >= 1){
+  datCheckErrorSave <- datCheckError
+} else {
+  # to clear out old error messages when you re-save summary info
+  datCheckErrorSave <- as.data.frame(t(rep(NA, ncol(datCheckError))))
+  colnames(datCheckErrorSave) <- colnames(datCheckError)
+}
+
 # range(datCheck$DiffA, na.rm = TRUE)
 # range(datCheck$DiffB, na.rm = TRUE)
 # range(datCheck$DiffP, na.rm = TRUE)
@@ -298,10 +306,20 @@ datPropEscCatch$DataType <- with(datPropEscCatch,
                                                                                                 DataType <- "Unknown" 
                                                                                          ))))))))))
 
+summaryDataTypes <- as.data.frame(c("No Data", "Missing Catch and Passage", "No esc (NA) w/ Catch/Passage",
+                                    "No esc (zero) w/ Catch/Passage", "No esc (zeros and NAs) w/ Catch/Passage",
+                                    "Partial esc (NAs) w/ Catch/Passage", "Partial esc (zeros) w/ Catch/Passage",
+                                    "Partial esc (zeros and NAs) w/ Catch/Passage", "Full esc w/ Catch/Passage", "Unknown"))
+colnames(summaryDataTypes) <- "Data type"
+summaryTableAll <- plyr::count(datPropEscCatch$DataType)
+
 # this just contains Fraser River stocks
 summaryTable <- plyr::count(datPropEscCatch$DataType)
 colnames(summaryTable) <- c("Data type", "Frequency Fraser stocks")
 # summaryTable <- as.data.frame(summaryTable)
+
+summaryTable <- left_join(summaryDataTypes, summaryTable, by = "Data type")
+summaryTable[is.na(summaryTable)] <- 0
 
 # Error table ----
 d <- datIGrped[rowSums(datIGrped[ , c("CatchBelow", "CatchAbove", "Passage")], na.rm = TRUE) == 0,]
@@ -351,7 +369,7 @@ View(errorTable)
 
 # save summary table
 datPropEscCatch <- as.data.frame(datPropEscCatch)
-datCheckError <- as.data.frame(datCheckError)
+datCheckError <- as.data.frame(datCheckErrorSave)
 
 # filename <- paste0(getwd(), "/Summaries/EscapementSummaryTable_", Sys.Date(),".xlsx")
 # 

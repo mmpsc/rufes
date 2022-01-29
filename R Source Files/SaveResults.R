@@ -9,10 +9,10 @@ setStyleAction(wb, XLC$"STYLE_ACTION.NONE")
 # Create sheets within the workbook (if they don't already exist)
 if(year < 2003) {
   for(sheet in c("CheckingDates", "CatchPassage_Summary", 
-                  "Esc_Summary", "Esc_ErrorSummary", "EscPropByDNAGrp", "Esc_Errors",
-                  "DBE_MA-RSA","DBE_ByStream", "DBE_Errors", "DBE_vsSEF", 
-                  "CatchRollup_Summary", "CatchRollup_Totals", "CatchRollup_Mismatches", "CatchRollup_Errors",
-                  "PsgRollup_Summary", "PsgRollup_Totals", "PsgRollup_Mismatches", "PsgRollup_Errors")){
+                 "Esc_Summary", "Esc_ErrorSummary", "EscPropByDNAGrp", "Esc_Errors",
+                 "DBE_MA-RSA","DBE_ByStream", "DBE_Errors", "DBE_vsSEF", 
+                 "CatchRollup_Summary", "CatchRollup_Totals", "CatchRollup_Mismatches", "CatchRollup_Errors",
+                 "PsgRollup_Summary", "PsgRollup_Totals", "PsgRollup_Mismatches", "PsgRollup_Errors")){
     createSheet(wb, name = sheet)
   }
 } else {
@@ -33,11 +33,34 @@ tmpNames <- data.frame(
            "Escapement", "DBEs", "Catch rollups", "Passage rollups"),
   b = c('CatchBelow', 'Passage', 'CatchAbove', 'Escapement', 
         'DBEs', 'CatchRollups', 'PassageRollups'))
+if(ncol(datDateLog) == 2){datDateLog$Errors <- rep(NA, 7)}
 
 if(length(datDateLog) > 0 & year >= 2003){
   datDateLog[ , 1] <- tmpNames$Col1
   datDateLog$`Date.Last.Checked`[which(tmpNames$b == check)] <- 
     as.character(as.Date(Sys.Date(), "%Y-%m-%d"))
+  
+  # add in whether are are errors for each checking aspect
+  if(check %in% c("CatchAbove", "CatchBelow", "Passage")){
+    if("Error" %in% summaryTable$Errors){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  } else if(check == "Escapement"){
+    if("error" %in% errorTable$Errors){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  } else if(check == "DBEs"){
+    if("error" %in% datLong$Errors | 
+       "missing broodstock" %in% datLong$MissingBroodstock){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  }
   
 } else if(length(datDateLog) > 0 & year < 2003 & 
           (check == "CatchBelow" | check == "CatchAbove" | check == "Passage")){
@@ -47,16 +70,51 @@ if(length(datDateLog) > 0 & year >= 2003){
                                          c("CatchBelow", "CatchAbove", "Passage"))] <- 
     as.character(as.Date(Sys.Date(), "%Y-%m-%d"))
   
+  # add in whether are are errors for each checking aspect
+  if(check %in% c("CatchAbove", "CatchBelow", "Passage")){
+    if("Error" %in% summaryTable$Errors){
+      datDateLog$`Errors`[which(tmpNames$b %in% 
+                                  c("CatchBelow", "CatchAbove", "Passage"))] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b %in% 
+                                  c("CatchBelow", "CatchAbove", "Passage"))] <- "No error" 
+    }
+  } else if(check == "Escapement"){
+    if("error" %in% errorTable$Errors){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  } else if(check == "DBEs"){
+    if("error" %in% datLong$Errors | 
+       "missing broodstock" %in% datLong$MissingBroodstock){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  }
+  
 } else if(length(datDateLog) == 0 & year < 2003 & 
           (check == "CatchBelow" | check == "CatchAbove" | check == "Passage")){
   
   datDateLog <- data.frame(
     Col1 = tmpNames$Col1,
-    Date.Last.Checked = c(rep(NA, 7))
-  )
+    Date.Last.Checked = c(rep(NA, 7)),
+    Errors = c(rep(NA, 7)))
+  
   datDateLog$`Date.Last.Checked`[which(tmpNames$b %in% 
                                          c("CatchBelow", "CatchAbove", "Passage"))] <- 
     as.character(as.Date(Sys.Date(), "%Y-%m-%d"))
+  
+  # add in whether are are errors for each checking aspect
+  if("Error" %in% summaryTable$Errors){
+    datDateLog$`Errors`[which(tmpNames$b %in% 
+                                c("CatchBelow", "CatchAbove", "Passage"))] <- "Error"
+  } else {
+    datDateLog$`Errors`[which(tmpNames$b %in% 
+                                c("CatchBelow", "CatchAbove", "Passage"))] <- "No error" 
+  }
+  
   
 } else if(length(datDateLog) > 0 & year < 2003 & 
           (check != "CatchBelow" & check != "CatchAbove" & check != "Passage")){
@@ -65,24 +123,62 @@ if(length(datDateLog) > 0 & year >= 2003){
   datDateLog$`Date.Last.Checked`[which(tmpNames$b == check)] <- 
     as.character(as.Date(Sys.Date(), "%Y-%m-%d"))
   
+  # add in whether are are errors for each checking aspect
+  if(check == "Escapement"){
+    if("error" %in% errorTable$Errors){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  } else if(check == "DBEs"){
+    if("error" %in% datLong$Errors | 
+       "missing broodstock" %in% datLong$MissingBroodstock){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  }
+  
 } else {
   
   datDateLog <- data.frame(
     Col1 = tmpNames$Col1,
-    Date.Last.Checked = c(rep(NA, 7))
-  )
+    Date.Last.Checked = c(rep(NA, 7)),
+    Errors = c(rep(NA, 7)))
+  
   datDateLog$`Date.Last.Checked`[which(tmpNames$b == check)] <- 
     as.character(as.Date(Sys.Date(), "%Y-%m-%d"))
   
+  # add in whether are are errors for each checking aspect
+  if(check %in% c("CatchAbove", "CatchBelow", "Passage")){
+    if("Error" %in% summaryTable$Errors){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  } else if(check == "Escapement"){
+    if("error" %in% errorTable$Errors){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  } else if(check == "DBEs"){
+    if("error" %in% datLong$Errors | 
+       "missing broodstock" %in% datLong$MissingBroodstock){
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "Error"
+    } else {
+      datDateLog$`Errors`[which(tmpNames$b == check)] <- "No error" 
+    }
+  }
 } 
 
-colnames(datDateLog) <- c("", "Date Last Checked")
+colnames(datDateLog) <- c("", "Date Last Checked", "Errors")
 writeWorksheet(wb, datDateLog, sheet = "CheckingDates", 
                startRow = 1, startCol = 1, header = TRUE)
 
 
 if(year < 2003 & 
-    (check == "CatchBelow" | check == "CatchAbove" | check == "Passage")){
+   (check == "CatchBelow" | check == "CatchAbove" | check == "Passage")){
   writeWorksheet(wb, summaryTable, sheet = "CatchPassage_Summary", 
                  startRow = 1, startCol = 1, header = TRUE)
   
