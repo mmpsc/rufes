@@ -10,14 +10,14 @@ p_load(here, tidyverse, magrittr, readxl, XLConnect, svDialogs,
 
 # Set parameters ------
 # SPECIFY YEAR
-year <- 1980
+year <- 2013
 
 # OPTIONAL: reset threshold for percent differences and database path
 threshold <- 1e-4
 db_path <- "//ADAMS/Data Sets/DB_Projects/AccessDBs/RuFEs/RuFEsR.accde"
 
 # SPECIFY CHECK
-check <- "CatchAbove"
+check <- "DBEs"
 # CatchAbove, CatchBelow, Passage, Escapement, DBEs, CatchRollups, PassageRollups
 # for pre-2003 years CatchAbove, CatchBelow, and Passage are checked together so just select 1
 

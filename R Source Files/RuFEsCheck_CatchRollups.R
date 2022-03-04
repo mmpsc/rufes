@@ -5,7 +5,7 @@
 # Created: Serena Wong, March 2021
 #
 # OBJECT DEFINITIONS: 
-#     * dat followed by a grouping (e.g. datCU or datStrea) gives the level that that 
+#     * dat followed by a grouping (e.g. datCU or datStream) gives the level that that 
 #       data is aggregated at (e.g. conservation unit and stream-level, respectively)
 #     * data with the cmt prefix is all data from the Common database and used for 
 #       stock translation
@@ -291,17 +291,17 @@ colnames(mismatchTable) <- c("RuFEs Groups per Source", "R Groups per Source",
 
 mismatchTable %<>% 
   rownames_to_column("GrpSource") %>% 
-  mutate(`No Included In Rollup` = ifelse(GrpSource %in% datNotInRollup$GrpSource,
-                                          `No Included In Rollup` <- 1,
-                                          `No Included In Rollup` <- 0)) %>% 
+  mutate(`Not Included In Rollup` = ifelse(GrpSource %in% datNotInRollup$GrpSource,
+                                          `Not Included In Rollup` <- 1,
+                                          `Not Included In Rollup` <- 0)) %>% 
   mutate(`Length Mismatch` = ifelse((`RuFEs Groups per Source` + 
-                                       `No Included In Rollup`) != 
+                                       `Not Included In Rollup`) != 
                                       `Joined Groups per Source` |
                                       `R Groups per Source` != 
                                       `Joined Groups per Source`, 
                                     `Length Mismatch` <- "mismatch",
                                     `Length Mismatch` <- "no mismatch")) %>% 
-  relocate(`No Included In Rollup`, .after = `RuFEs Groups per Source`)
+  relocate(`Not Included In Rollup`, .after = `RuFEs Groups per Source`)
 
 View(datError)
 View(mismatchTable)

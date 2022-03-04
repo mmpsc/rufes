@@ -19,7 +19,7 @@
 # Functions ----
 `%!in%` <- negate(`%in%`)
 
-funcLoadRuFEs_ByPop <- function(dbPath, Grouping, Yr, abMission){
+funcLoadRuFEs_ByPop <- function(dbPath, Yr){
   # set up driver info and database path
   driverInfo <- "Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
   path <- paste0(driverInfo, "DBQ=", dbPath)
