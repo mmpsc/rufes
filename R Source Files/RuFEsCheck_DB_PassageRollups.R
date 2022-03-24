@@ -38,12 +38,36 @@ datSpDis <- readxl::read_excel(paste0(year, "ruqDataSource_DailyPassage_Spawning
 datSpDisStk <- readxl::read_excel(paste0(year, "ruqDataSource_DailyPassage_SpawningDistrictStockGrp.xlsx"),
                                   sheet = "ruqDataSource_DailyPassage")
 
-# Common data 
-cmtStocks <- readxl::read_excel(paste0(here(), "/Data/cmtStocks.xlsx"), sheet = "Sheet1")
-# management groups
-cmtMG <- readxl::read_excel(paste0(here(), "/Data/cmtManagementGroups.xlsx"), sheet = "Sheet1")
-# management group details
-cmtMGD <- readxl::read_excel(paste0(here(), "/Data/cmtManagementGroupsDetails.xlsx"), sheet = "Sheet1")
+# Function to load common data 
+funcLoadRuFEs_CommonData <- function(dbPath){
+  # set up driver info and database path
+  # library(RODBC)
+  driverInfo <- "Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
+  path <- paste0(driverInfo, "DBQ=", dbPath)
+  
+  # establish connection
+  channel <- RODBC::odbcDriverConnect(path)
+  on.exit(odbcClose(channel))
+  
+  # extract table of interest as dataframe
+  cmtStocks <- sqlQuery(channel, 
+                        paste0("SELECT * 
+                          FROM [cmtStocks];"))   
+  cmtManagementGroups <- sqlQuery(channel, 
+                                  paste0("SELECT * 
+                          FROM [cmtManagementGroups];"))
+  cmtManagementGroupsDetails <- sqlQuery(channel, 
+                                         paste0("SELECT * 
+                          FROM [cmtManagementGroupsDetails];"))
+  
+  # assign dataframe to environment
+  assign("cmtStocks", cmtStocks, envir = .GlobalEnv)
+  assign("cmtMG", cmtManagementGroups, envir = .GlobalEnv)
+  assign("cmtMGD", cmtManagementGroupsDetails, envir = .GlobalEnv)
+}
+
+# Load common data 
+funcLoadRuFEs_CommonData(dbPath = db_path)
 
 # Organize Common data ----
 cmtStocks %<>% 
