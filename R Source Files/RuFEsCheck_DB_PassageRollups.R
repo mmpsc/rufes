@@ -33,6 +33,8 @@ datProdStk <- readxl::read_excel(paste0(year, "ruqDataSource_DailyPassage_Produc
                                  sheet = "ruqDataSource_DailyPassage")
 datProdStks <- readxl::read_excel(paste0(year, "ruqDataSource_DailyPassage_ProductionStocks.xlsx"),
                                   sheet = "ruqDataSource_DailyPassage")
+datReconGrp <- readxl::read_excel(paste0(year, "ruqDataSource_DailyPassage_ReconstructionGrp.xlsx"),
+                                  sheet = "ruqDataSource_DailyPassage")
 datSpDis <- readxl::read_excel(paste0(year, "ruqDataSource_DailyPassage_SpawningDistrictGrp.xlsx"),
                                sheet = "ruqDataSource_DailyPassage")
 datSpDisStk <- readxl::read_excel(paste0(year, "ruqDataSource_DailyPassage_SpawningDistrictStockGrp.xlsx"),
@@ -113,7 +115,7 @@ dat <- full_join(datStream, cmtSubW, by = c("GroupName_DNA Group", "Stream"))
 dat %<>% 
   tidyr::drop_na(Year, SumOfStockCatch) %>% 
   dplyr::select(c(Year, Stream, SumOfStockCatch, DFOCode, 
-                  `GroupName_Conservation Unit`, 
+                  `GroupName_Conservation Unit`,        
                   `GroupName_DNA Group`, 
                   `GroupName_Fraser Panel Mgmt Group`,
                   `GroupName_Fraser Panel Stock Group`, 
@@ -121,9 +123,10 @@ dat %<>%
                   `GroupName_Production Mgmt Group`,
                   `GroupName_Production Stock Group`,
                   `GroupName_Production Stocks`,
+                  `GroupName_Reconstruction Group`,
                   `GroupName_Spawning District Group`,
                   `GroupName_Spawning District Stock Group`,
-                  `GroupAbbr_Conservation Unit`,
+                  `GroupAbbr_Conservation Unit`, 
                   `GroupAbbr_DNA Group`, 
                   `GroupAbbr_Fraser Panel Mgmt Group`,
                   `GroupAbbr_Fraser Panel Stock Group`, 
@@ -131,6 +134,7 @@ dat %<>%
                   `GroupAbbr_Production Mgmt Group`,
                   `GroupAbbr_Production Stock Group`,
                   `GroupAbbr_Production Stocks`,
+                  `GroupAbbr_Reconstruction Group`,
                   `GroupAbbr_Spawning District Group`,
                   `GroupAbbr_Spawning District Stock Group`))
 
@@ -144,6 +148,7 @@ datMA$Source <- "MA"
 datProdMgmt$Source <-  "ProdMgmt"
 datProdStk$Source <- "ProdStk"
 datProdStks$Source <- "ProdStks"
+datReconGrp$Source <- "ReconGrp"
 datSpDis$Source <- "SpDis"
 datSpDisStk$Source <- "SpDisStk"
 
@@ -155,6 +160,7 @@ datL <- list("Conservation Unit" = datCU,
              "Production Mgmt Group" = datProdMgmt, 
              "Production Stock Group" = datProdStk,
              "Production Stocks" = datProdStks, 
+             "Reconstruction Group" = datReconGrp,
              "Spawning District Group" = datSpDis, 
              "Spawning District Stock Group" = datSpDisStk)
 
@@ -273,6 +279,7 @@ datTotal <- datLong %>%
                             ProdMgmt = "Production Mgmt Group", 
                             ProdStk = "Production Stock Group", 
                             ProdStks = "Production Stocks", 
+                            datReconGrp = "Reconstruction Group",
                             SpDis = "Spawning District Group", 
                             SpDisStk = "Spawning District Stock Group")) %>% 
   dplyr::select(-Source) %>% 

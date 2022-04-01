@@ -33,6 +33,8 @@ datProdStk <- readxl::read_excel(paste0(year, "ruqDataSource_DailyCatch_Producti
                                  sheet = "ruqDataSource_DailyCatch")
 datProdStks <- readxl::read_excel(paste0(year, "ruqDataSource_DailyCatch_ProductionStocks.xlsx"),
                                   sheet = "ruqDataSource_DailyCatch")
+datReconGrp <- readxl::read_excel(paste0(year, "ruqDataSource_DailyCatch_ReconstructionGrp.xlsx"),
+                                  sheet = "ruqDataSource_DailyCatch")
 datSpDis <- readxl::read_excel(paste0(year, "ruqDataSource_DailyCatch_SpawningDistrictGrp.xlsx"),
                                sheet = "ruqDataSource_DailyCatch")
 datSpDisStk <- readxl::read_excel(paste0(year, "ruqDataSource_DailyCatch_SpawningDistrictStockGrp.xlsx"),
@@ -100,6 +102,7 @@ dat %<>%
                   `GroupName_Production Mgmt Group`,
                   `GroupName_Production Stock Group`,
                   `GroupName_Production Stocks`,
+                  `GroupName_Reconstruction Group`,
                   `GroupName_Spawning District Group`,
                   `GroupName_Spawning District Stock Group`,
                   `GroupAbbr_Conservation Unit`, 
@@ -110,6 +113,7 @@ dat %<>%
                   `GroupAbbr_Production Mgmt Group`,
                   `GroupAbbr_Production Stock Group`,
                   `GroupAbbr_Production Stocks`,
+                  `GroupAbbr_Reconstruction Group`,
                   `GroupAbbr_Spawning District Group`,
                   `GroupAbbr_Spawning District Stock Group`))
 
@@ -123,6 +127,7 @@ datMA$Source <- "MA"
 datProdMgmt$Source <-  "ProdMgmt"
 datProdStk$Source <- "ProdStk"
 datProdStks$Source <- "ProdStks"
+datReconGrp$Source <- "ReconGrp"
 datSpDis$Source <- "SpDis"
 datSpDisStk$Source <- "SpDisStk"
 
@@ -134,6 +139,7 @@ datL <- list("Conservation Unit" = datCU,
              "Production Mgmt Group" = datProdMgmt, 
              "Production Stock Group" = datProdStk,
              "Production Stocks" = datProdStks, 
+             "Reconstruction Group" = datReconGrp,
              "Spawning District Group" = datSpDis, 
              "Spawning District Stock Group" = datSpDisStk)
 
@@ -250,6 +256,7 @@ datTotal <- datLong %>%
                             ProdMgmt = "Production Mgmt Group", 
                             ProdStk = "Production Stock Group", 
                             ProdStks = "Production Stocks", 
+                            ReconGrp = "Reconstruction Group",
                             SpDis = "Spawning District Group", 
                             SpDisStk = "Spawning District Stock Group")) %>% 
   dplyr::select(-Source) %>% 
