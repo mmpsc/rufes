@@ -5,23 +5,19 @@ rm(list = ls())
 if(!require(pacman)) install.packages("pacman")
 library(pacman)
 
-p_load(here, tidyverse, magrittr, readxl, XLConnect, svDialogs,
-       lubridate, RODBC, odbc, DBI)
+p_load(here, tidyverse, magrittr, readxl, XLConnect, svDialogs)
 
 # Set parameters ------
 # SPECIFY YEAR
 year <- 2017
 
-# OPTIONAL: reset threshold for percent differences and database path
+# SET THRESHOLD FOR PERCENT DIFFERENCE
 threshold <- 1e-4
-db_path <- "//ADAMS/Data Sets/DB_Projects/AccessDBs/RuFEs/RuFEsR.accde"
 
 # SPECIFY CHECK
-check <- "CatchRollups"
+check <- "CatchBelow"
 # CatchAbove, CatchBelow, Passage, Escapement, DBEs, CatchRollups, PassageRollups
 # for pre-2003 years CatchAbove, CatchBelow, and Passage are checked together so just select 1
-
-gc() 
 
 # Set working directory -----
 if(check == "CatchRollups" | check == "PassageRollups"){
@@ -33,23 +29,23 @@ if(check == "CatchRollups" | check == "PassageRollups"){
 # Source the relevant checking code and run ----
 if(year < 2003 & 
    (check == "CatchBelow" | check == "CatchAbove" | check == "Passage")){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_Pre2003CatchPassage.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_Pre2003CatchPassage.R"))
 } else if(year < 2003 & check == "Escapement"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_Pre2003Escapement.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_Pre2003Escapement.R"))
 } else if(check == "CatchAbove"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_AboveMission.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_AboveMission.R"))
 } else if (check == "CatchBelow"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_BelowMission.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_BelowMission.R"))
 } else if (check == "Passage"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_Passage.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_Passage.R"))
 } else if (check == "Escapement"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_Escapement.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_Escapement.R"))
 } else if (check == "DBEs"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_DBE.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_DBE.R"))
 } else if (check == "CatchRollups"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_CatchRollups.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_CatchRollups.R"))
 } else if (check == "PassageRollups"){
-  source(paste0(here(), "/R Source Files/RuFEsCheck_DB_PassageRollups.R"))
+  source(paste0(here(), "/R Source Files/RuFEsCheck_PassageRollups.R"))
 }
 
 # Write results to summary workbook -----
@@ -90,6 +86,13 @@ setdiff(datRF$RF_Stock, datCR$CR_Stock)
 
 unlink(paste0(here(), "/", year, 
               "/RuFEsQAQC_Summary_", year, ".xlsx"), recursive = TRUE)
+
+
+
+
+
+
+
 
 
 
